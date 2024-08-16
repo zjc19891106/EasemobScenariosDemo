@@ -34,17 +34,17 @@
 User A (Caller)   |  User B (Callee)   |  Server
 ---------------------------------------------------------
     Login              Login               Match Users
-     |                   |                     |
-     |                   |----Matching---------|
-     |<------Match Info--|                     |
-     |----Start Call---->|                     |
-     |                   |<---Receive Call----|
-     |                   |----Accept Call---->|
-     |<---Call Connected->|                     |
-     |                   |                     |
-     |----End Call------>|                     |
-     |                   |<---Call Ended------|
-     |                   |                     |
+     |                    |                             |
+     |                    |------------Matching---------|
+     |<------Match Info-- |                             |
+     |----Start Call----> |                             |
+     |                    |<-------Receive Call---------|
+     |                    |--------Accept Call--------> |
+     |<---Call Connected->|                             |
+     |                    |                             |
+     |----End Call------> |                             |
+     |                    |<--------Call Ended--------- |
+     |                    |                             |
 
 
 ## 呼叫流程
