@@ -31,14 +31,14 @@ final class CardConversationsView: UIView {
         self.backgroundColor = .clear
         self.refresh(messages: infos)
         self.addSubViews([self.cardConversationsList])
-        self.delayedTask()
     }
     
     func refresh(messages: [ChatMessage]) {
-        self.conversations.append(contentsOf: messages.map({
-            self.convertToConversationInfo(with: $0)
-        }))
+        for message in messages {
+            self.newConversation(with: message)
+        }
         self.cardConversationsList.reloadData()
+        self.delayedTask()
     }
     
     required init?(coder: NSCoder) {
@@ -58,6 +58,7 @@ final class CardConversationsView: UIView {
     func performDelayTask() {
         DispatchQueue.main.async {
             self.dismissClosure?(nil)
+            self.conversations.removeAll()
         }
     }
     
@@ -67,11 +68,10 @@ final class CardConversationsView: UIView {
             exist.lastMessage = message
             exist.showContent = exist.contentAttribute()
             self.conversations.bringToFront { $0.id == message.conversationId }
+            
         } else {
             self.conversations.append(info)
         }
-        self.cardConversationsList.reloadData()
-        self.delayedTask()
     }
     
     func convertToConversationInfo(with message: ChatMessage) -> ConversationInfo {
@@ -86,13 +86,9 @@ final class CardConversationsView: UIView {
 }
 
 extension CardConversationsView: UICollectionViewDelegate, UICollectionViewDataSource,UICollectionViewDelegateFlowLayout {
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        CGSize(width: self.frame.width-32, height: 60)
-    }
-    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        self.conversations.array.count
+        print("conversations.count:\(self.conversations.count)")
+        return self.conversations.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -191,6 +187,11 @@ final class SlidableCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
+        super.apply(layoutAttributes)
+        self.contentView.transform = layoutAttributes.transform
+        self.updateFrame()
+    }
     
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -199,8 +200,8 @@ final class SlidableCollectionViewCell: UICollectionViewCell {
     
     private func updateFrame() {
         self.avatar.frame = CGRect(x: 16, y: (self.contentView.frame.height-40)/2.0, width: 40, height: 40)
-        self.nickName.frame = CGRect(x: self.avatar.frame.maxX+12, y: self.avatar.frame.minX+4, width: self.contentView.frame.width-self.avatar.frame.maxX-12-16, height: 16)
-        self.content.frame = CGRect(x: self.avatar.frame.maxX+12, y: self.nickName.frame.maxY+2, width: self.nickName.frame.width, height: 20)
+        self.nickName.frame = CGRect(x: self.avatar.frame.maxX+12, y: self.avatar.frame.minX, width: self.contentView.frame.width-self.avatar.frame.maxX-12-16, height: 16)
+        self.content.frame = CGRect(x: self.avatar.frame.maxX+12, y: self.avatar.frame.maxY-20, width: self.nickName.frame.width, height: 20)
         let r = self.avatar.frame.width / 2.0
         let length = CGFloat(sqrtf(Float(r)))
         let x = r + length + 3

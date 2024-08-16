@@ -105,6 +105,7 @@
 		05545CF82C5CC3C10000123E /* ImagePreviewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImagePreviewController.swift; sourceTree = "<group>"; };
 		05545CF92C5CC3C10000123E /* ImagePreviewTransitionDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImagePreviewTransitionDelegate.swift; sourceTree = "<group>"; };
 		05545CFA2C5CC3C10000123E /* PreviewImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreviewImage.swift; sourceTree = "<group>"; };
+		05555A672C6F106900934C3C /* EasemobScenariosDemo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = EasemobScenariosDemo.entitlements; sourceTree = "<group>"; };
 		056C815A2C65B2F000555F46 /* ConversationsPopViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationsPopViewController.swift; sourceTree = "<group>"; };
 		056C815C2C65BBCA00555F46 /* MessagesPopViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesPopViewController.swift; sourceTree = "<group>"; };
 		056C815E2C65FE7E00555F46 /* Users1v1Header.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Users1v1Header.swift; sourceTree = "<group>"; };
@@ -220,6 +221,7 @@
 		05545CAF2C5C6C080000123E /* EasemobScenariosDemo */ = {
 			isa = PBXGroup;
 			children = (
+				05555A672C6F106900934C3C /* EasemobScenariosDemo.entitlements */,
 				056D2BBA2C6313FA0078556D /* Scenes */,
 				05545CD62C5CC3C10000123E /* CustomConstants */,
 				05545CD32C5CC3C10000123E /* IntegratedFromEaseChatUIKit */,
@@ -753,6 +755,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_ENTITLEMENTS = EasemobScenariosDemo/EasemobScenariosDemo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = JC854K845H;
@@ -760,6 +763,10 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = EasemobScenariosDemo/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "环信1v1";
+				INFOPLIST_KEY_NSCameraUsageDescription = "For usage";
+				INFOPLIST_KEY_NSFileProviderDomainUsageDescription = "For usage";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "For usage";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "For usage";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen.storyboard";
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -772,7 +779,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.easemob.scenarios.demo.EasemobScenariosDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.easemob.scenarios.EasemobScenariosDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -787,6 +794,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_ENTITLEMENTS = EasemobScenariosDemo/EasemobScenariosDemo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = JC854K845H;
@@ -794,6 +802,10 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = EasemobScenariosDemo/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "环信1v1";
+				INFOPLIST_KEY_NSCameraUsageDescription = "For usage";
+				INFOPLIST_KEY_NSFileProviderDomainUsageDescription = "For usage";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "For usage";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "For usage";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen.storyboard";
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -806,7 +818,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.easemob.scenarios.demo.EasemobScenariosDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.easemob.scenarios.EasemobScenariosDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;

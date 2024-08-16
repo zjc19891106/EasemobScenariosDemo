@@ -2,15 +2,7 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>For usage</string>
 	<key>Privacy - File Access Usage Description</key>
-	<string>For usage</string>
-	<key>NSFileProviderDomainUsageDescription</key>
-	<string>For usage</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>For usage</string>
-	<key>NSCameraUsageDescription</key>
 	<string>For usage</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>

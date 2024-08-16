@@ -17,10 +17,11 @@ struct LimitedArray<Element> {
     }
 
     mutating func append(_ element: Element) {
-        if self.elements.count < self.maxCount {
+        if self.elements.count <= self.maxCount {
             self.elements.append(element)
         } else {
             self.elements.removeFirst()
+            self.elements.append(element)
         }
     }
     
@@ -51,6 +52,14 @@ struct LimitedArray<Element> {
 
     var array: [Element] {
         return elements
+    }
+    
+    var count: Int {
+        return elements.count
+    }
+    
+    mutating func removeAll() {
+        self.elements.removeAll()
     }
     
     func contains(where predicate: (Element) throws -> Bool) rethrows -> Bool {
