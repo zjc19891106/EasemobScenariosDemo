@@ -30,6 +30,22 @@
 1. 用户登录后，客户端调用匹配接口向服务端报告上线状态，或在自动登录成功后，用户调用匹配接口自动进入随机匹配池。
 2. 服务端进行匹配，一旦成功，分别向双方返回匹配到的用户`matchedChatUser`以及自己的加入rtc频道所需的 `channelName`、`token`、 和 `uid`。
 3. 如果是新用户上线，服务端直接返回上述信息；对于老用户，服务端通过CMD消息通知其匹配到新用户，信令Key为 `EaseMob1v1SomeUserMatchedYou`，老用户收到的CMD消息中携带上述步骤2中信息。
+   
+User A (Caller)   |  User B (Callee)   |  Server
+---------------------------------------------------------
+    Login              Login               Match Users
+     |                   |                     |
+     |                   |----Matching---------|
+     |<------Match Info--|                     |
+     |----Start Call---->|                     |
+     |                   |<---Receive Call----|
+     |                   |----Accept Call---->|
+     |<---Call Connected->|                     |
+     |                   |                     |
+     |----End Call------>|                     |
+     |                   |<---Call Ended------|
+     |                   |                     |
+
 
 ## 呼叫流程
 
