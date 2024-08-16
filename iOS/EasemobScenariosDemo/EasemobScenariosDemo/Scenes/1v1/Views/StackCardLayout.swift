@@ -61,7 +61,7 @@ final class StackCardLayout: UICollectionViewLayout {
         let width = collectionView.bounds.width - 16
         let height = collectionView.bounds.height - 16
         
-        let frame = CGRect(x: 8, y: 8, width: width, height: height)
+        let frame = CGRect(x: 8, y: 16, width: width, height: height)
         attributes.frame = frame
         
         // 计算cell的位置

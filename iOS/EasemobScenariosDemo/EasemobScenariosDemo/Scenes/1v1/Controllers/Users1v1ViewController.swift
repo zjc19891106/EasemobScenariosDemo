@@ -179,9 +179,6 @@ extension Users1v1ViewController: Users1v1ChatViewModelListener {
     
     func receiveOtherMessage(message: [EaseChatUIKit.ChatMessage]) {
         DispatchQueue.main.async {
-            if UIViewController.currentController is ConversationsPopViewController {
-                return
-            }
             self.inputBar.hiddenInput()
             if self.popVC == nil {
                 self.popVC = ConversationsPopViewController(messages: message) { [weak self] conversation in
@@ -201,8 +198,14 @@ extension Users1v1ViewController: Users1v1ChatViewModelListener {
                 }
             }
             if let vc = self.popVC {
-                self.popVC?.refresh(messages: message)
-                self.presentViewController(vc,animated: true)
+                if vc.isBeingPresented {
+                    self.popVC?.refresh(messages: message)
+                }  else {
+                    if UIViewController.currentController is ConversationsPopViewController {
+                        return
+                    }
+                    self.presentViewController(vc,animated: true)
+                }
             }
         }
         

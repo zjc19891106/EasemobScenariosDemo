@@ -10,10 +10,10 @@ import EaseChatUIKit
 
 final class ConversationsPopViewController: UIViewController, PresentedViewType {
     
-    var presentedViewComponent: EaseChatUIKit.PresentedViewComponent? = PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: StatusBarHeight+84),destination: .topBaseline)
+    var presentedViewComponent: EaseChatUIKit.PresentedViewComponent? = PresentedViewComponent(contentSize: CGSize(width: ScreenWidth, height: StatusBarHeight+78),destination: .topBaseline)
     
     lazy var cardConversationView: CardConversationsView = {
-        CardConversationsView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: StatusBarHeight+84), infos: self.messages)
+        CardConversationsView(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: StatusBarHeight+78), infos: self.messages)
     }()
     
     var messages = [EaseChatUIKit.ChatMessage]()
@@ -41,6 +41,10 @@ final class ConversationsPopViewController: UIViewController, PresentedViewType 
     
     func refresh(messages: [EaseChatUIKit.ChatMessage]) {
         self.cardConversationView.refresh(messages: messages)
+    }
+    
+    func append(message: EaseChatUIKit.ChatMessage) {
+        self.cardConversationView.newConversation(with: message)
     }
 
 }

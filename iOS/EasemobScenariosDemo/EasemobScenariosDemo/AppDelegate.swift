@@ -45,9 +45,9 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         options.enableRequireReadAck = true
         //Simulator can't use APNS, so we need to judge whether it is a real machine.
         #if DEBUG
-        options.apnsCertName = "EaseIM_APNS_Developer"
+        options.apnsCertName = "apns-scenario-push"
         #else
-        options.apnsCertName = "EaseIM_APNS_Product"
+        options.apnsCertName = "apns-scenario-push"
         #endif
         //Set up EaseChatUIKit
         _ = EaseChatUIKitClient.shared.setup(option: options)

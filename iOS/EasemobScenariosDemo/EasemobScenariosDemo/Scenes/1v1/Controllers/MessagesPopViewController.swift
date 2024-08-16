@@ -36,7 +36,7 @@ final class MessagesPopViewController: MessageListController, PresentedViewType 
     }
     
     override func createMessageContainer() -> MessageListView {
-        MessageListView(frame: CGRect(x: 0, y: self.navigation.frame.maxY, width: self.view.frame.width, height: self.view.frame.height-self.navigation.frame.height-52-20), mention: self.chatType == .group)
+        MessageListView(frame: CGRect(x: 0, y: self.navigation.frame.maxY, width: self.view.frame.width, height: self.view.frame.height-self.navigation.frame.height-52-(StatusBarHeight-10)), mention: self.chatType == .group)
     }
     
     lazy var indicator: UIView = {
