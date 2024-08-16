@@ -71,6 +71,9 @@ final class EaseMob1v1CallKit: NSObject {
         self.agoraKit?.leaveChannel()
         AgoraRtcEngineKit.destroy()
         self.agoraKit = nil
+        PresenceManager.shared.publishPresence(description: "") { error in
+            consoleLogInfo("publishPresence error:\(error?.errorDescription ?? "")", type: .error)
+        }
     }
     
     func joinChannel(success: @escaping () -> Void) {
