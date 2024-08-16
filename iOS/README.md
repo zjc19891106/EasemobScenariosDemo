@@ -1,9 +1,9 @@
 
-# 1v1 场景化Demo大体流程
+# 1v1 场景化Demo主题呼叫流程
 
 ## 概述
 
-此文档描述了 1v1 场景化Demo的实现方案，包括用户匹配、呼叫、接听、通话结束等功能的逻辑流程和代码示例。该Demo基于EaseMob1v1CallKit框架，实现了用户在匹配池中随机匹配、发起视频通话邀请、通话接听与结束的全流程。
+此文档描述了 1v1 场景化Demo的实现方案，包括用户匹配、呼叫、接听、通话结束等功能的逻辑流程和代码示例。该Demo基于EaseMob1v1CallKit框架，实现了用户在匹配池中随机匹配、发起视频通话邀请、通话接听与结束的全流程。针对结束流程，Demo提供了正常结束、取消呼叫、拒绝接听、超时、用户忙碌等多种结束原因的处理方法。在结束呼叫时对RTC资源做了及时释放，同时更新用户Presence状态，以便下次匹配或其他用户呼叫。
 
 ## 目录
 
@@ -13,12 +13,14 @@
 4. [结束流程](#结束流程)
 5. [处理同时匹配与邀请](#处理同时匹配与邀请)
 6. [信令协议与常量枚举](#信令协议与常量枚举)
+7. [信令协议相关方法](#信令协议相关方法)
+8. [服务端源码](#服务端源码)
 
 ## 匹配场景
 
-1. 用户登录后，客户端向服务端报告上线状态，或在自动登录成功后，用户自动进入随机匹配池。
-2. 服务端进行匹配，一旦成功，分别向双方返回匹配到的 `channelName`、`token`、`userId` 和 `uid`。
-3. 如果是新用户上线，服务端直接返回上述信息；对于老用户，服务端通过CMD消息通知其匹配到新用户，信令Key为 `EaseMob1v1SomeUserMatchedYou`。
+1. 用户登录后，客户端调用匹配接口向服务端报告上线状态，或在自动登录成功后，用户调用匹配接口自动进入随机匹配池。
+2. 服务端进行匹配，一旦成功，分别向双方返回匹配到的用户`matchedChatUser`以及自己的加入rtc频道所需的 `channelName`、`token`、 和 `uid`。
+3. 如果是新用户上线，服务端直接返回上述信息；对于老用户，服务端通过CMD消息通知其匹配到新用户，信令Key为 `EaseMob1v1SomeUserMatchedYou`，老用户收到的CMD消息中携带上述步骤2中信息。
 
 ## 呼叫流程
 
@@ -96,6 +98,22 @@
        self.hangup()
    }
    ```
+   
+2. 主动结束方需要调用PresenceManager接口将自己的Presence状态设置为 `online`，以便下次匹配或者其他用户呼叫。
+示例代码`EaseMob1v1CallKit.shared.hangup()`
+```Swift
+    func hangup() {
+        self.agoraKit?.stopPreview()
+        self.agoraKit?.disableAudio()
+        self.agoraKit?.disableVideo()
+        self.agoraKit?.leaveChannel()
+        AgoraRtcEngineKit.destroy()
+        self.agoraKit = nil
+        PresenceManager.shared.publishPresence(description: "") { error in
+            consoleLogInfo("publishPresence error:\(error?.errorDescription ?? "")", type: .error)
+        }
+    }
+```
 
 ## 处理同时匹配与邀请
 
@@ -120,7 +138,7 @@
   - `busyEnd`: 用户忙碌
   - `rtcError`: RTC 错误
 
-## 附录
+## 信令协议相关方法
 
 ### 相关方法实现
 
@@ -156,6 +174,6 @@
    }
    ```
 
----
+## 服务端源码
 
-该 README 详细介绍了 1v1 场景化 Demo 方案中的各个核心流程及相关代码示例，便于开发者理解与实现。
+服务端源码请参考：[1v1Video-Chat-Call-Server-Api](）
