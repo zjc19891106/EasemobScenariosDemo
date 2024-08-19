@@ -23,7 +23,6 @@ final class CallAlertViewController: UIViewController,PresentedViewType {
         }
         callView.actionClosure = { [weak self] in
             if $0 == .accept {
-                self?.refuse = false
                 EaseMob1v1CallKit.shared.acceptCall()
             }  else {
                 if callView.role == .caller {
@@ -36,8 +35,6 @@ final class CallAlertViewController: UIViewController,PresentedViewType {
         }
         return callView
     }()
-    
-    private var refuse = true
     
     private var role: CallPopupView.CallRole
     
@@ -86,13 +83,6 @@ extension CallAlertViewController: TimerListener {
         if timeout {
             EaseMob1v1CallKit.shared.endCall(reason: EaseMob1v1CallKitEndReason.timeoutEnd.rawValue)
         }
-        if self.refuse {
-            PresenceManager.shared.publishPresence(description: "") { error in
-                if error != nil {
-                    consoleLogInfo("publishPresence error: \(error?.errorDescription ?? "")",type: .error)
-                }
-            }
-        }
         self.dismiss(animated: true,completion: completion)
     }
 }
@@ -105,7 +95,7 @@ final class RingerService {
         // 设置音频会话
         setupAudioSession()
         
-        // 播放系统默认铃声并震动
+        // 播放系统默认铃声
         playSystemSound()
     }
 

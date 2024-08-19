@@ -37,11 +37,11 @@ private class TimerMaker: GCDTimer {
     
     /// 当前Timer 运行状态
     enum TimerState {
-        case runing
+        case running
         case stoped
     }
     
-    private var state = TimerState.stoped
+    public private(set) var state = TimerState.stoped
     
     private var timer: DispatchSourceTimer?
     
@@ -63,8 +63,8 @@ private class TimerMaker: GCDTimer {
     
     
     func resume() {
-        guard state != .runing else { return }
-        state = .runing
+        guard state != .running else { return }
+        state = .running
         timer?.resume()
     }
     
@@ -140,6 +140,9 @@ final class GlobalTimer {
         self.timers.setObject(timerHandler, forKey: key as NSString)
         let currentTimeStamp = Int(Date().timeIntervalSince1970*1000)
         self.startTimeMap[key] = currentTimeStamp
+        if let timerInstance = self.timer as? TimerMaker ,timerInstance.state == .stoped {
+            self.timer?.resume()
+        }
     }
     
     func removeTimer(_ key: String) {
@@ -149,6 +152,9 @@ final class GlobalTimer {
         self.startTimeMap.removeValue(forKey: key)
         self.lock.unlock()
         self.removeTimerKey = ""
+        if self.timers.count <= 0 {
+            self.timer?.cancel()
+        }
     }
     
     func removeAll() {

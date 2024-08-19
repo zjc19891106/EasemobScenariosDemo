@@ -45,7 +45,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         options.enableRequireReadAck = true
         //Simulator can't use APNS, so we need to judge whether it is a real machine.
         #if DEBUG
-        options.apnsCertName = "apns-scenario-push"
+        options.apnsCertName = "aps-scenario-push-dev"
         #else
         options.apnsCertName = "apns-scenario-push"
         #endif
