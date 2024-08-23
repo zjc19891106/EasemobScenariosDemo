@@ -150,7 +150,12 @@ final class MineMessageListViewController: MessageListController {
         self.role = role
         self.requestCameraAndMicrophonePermissions { permission in
             if permission {
+                EaseMob1v1CallKit.shared.currentUser.matchedChatUser = self.profile.id
+                
                 let call = CallAlertViewController(role: .caller, profile: self.profile)
+                if role == .caller {
+                    EaseMob1v1CallKit.shared.startCall()
+                }
                 self.presentViewController(call,animated: true)
             }
         }

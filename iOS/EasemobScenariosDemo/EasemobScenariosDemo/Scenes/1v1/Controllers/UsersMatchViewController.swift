@@ -11,6 +11,8 @@ import AVFoundation
 
 final class UsersMatchViewController: UIViewController {
     
+    @UserDefault("EaseScenariosDemoPhone", defaultValue: "") private var phone
+    
     lazy var background: UIImageView = {
         UIImageView(frame: self.view.bounds).contentMode(.scaleAspectFill).image(UIImage(named: "login_bg"))
     }()
@@ -59,7 +61,7 @@ final class UsersMatchViewController: UIViewController {
         EaseMob1v1CallKit.shared.removeListener(listener: self)
     }
     
-    private func showCallView(role: CallPopupView.CallRole = .caller) {
+    private func showCallView(role: CallPopupView.CallRole = .caller,reason: String = "") {
         self.role = role
         self.requestCameraAndMicrophonePermissions { permission in
             if permission {
@@ -68,7 +70,13 @@ final class UsersMatchViewController: UIViewController {
                     onCall = true
                 }
                 if !onCall {
-                    let call = CallAlertViewController(role: role, profile: self.viewModel.matchedUser)
+                    var profile: EaseProfileProtocol = EaseChatProfile()
+                    if reason.isEmpty { profile = self.viewModel.matchedUser } else {
+                        if let user = EaseChatUIKitContext.shared?.userCache?[reason] {
+                            profile = user
+                        }
+                    }
+                    let call = CallAlertViewController(role: role, profile: profile)
                     UIViewController.currentController?.presentViewController(call,animated: true)
                 } else {
                     EaseMob1v1CallKit.shared.endCall(reason: EaseMob1v1CallKitEndReason.busyEnd.rawValue)
@@ -127,10 +135,18 @@ extension UsersMatchViewController: EaseMobCallKit.CallListener {
     func onCallStatusChanged(status: EaseMobCallKit.CallStatus, reason: String) {
         DispatchQueue.main.async {
             switch status {
+            case .idle:
+                self.matchedUser.isHidden = true
+                self.showToast(toast: reason)
             case .alert:
-                self.showCallView(role: .callee)
+                self.showCallView(role: .callee,reason: reason)
             case .preparing:
-                self.matchedUser.refresh(profile: EaseMob1v1CallKit.shared.currentUser)
+                self.matchedUser.isHidden = false
+                if let user = EaseChatUIKitContext.shared?.userCache?[reason] {
+                    self.matchedUser.refresh(profile: user)
+                } else {
+                    self.matchedUser.refresh(profile: EaseMob1v1CallKit.shared.currentUser)
+                }
             case .onCalling:
                 print("join channel:\(Date().timeIntervalSince1970)")
             case .join:
@@ -162,7 +178,7 @@ extension UsersMatchViewController: EaseMobCallKit.CallListener {
     }
     
     func cancelMatch() {
-        EasemobBusinessRequest.shared.sendDELETERequest(api: .matchUser(()), params: [:]) { result, error in
+        EasemobBusinessRequest.shared.sendDELETERequest(api: .cancelMatch(self.phone), params: [:]) { result, error in
             
         }
     }

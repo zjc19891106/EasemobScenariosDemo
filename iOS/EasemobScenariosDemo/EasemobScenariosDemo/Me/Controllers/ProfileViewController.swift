@@ -163,7 +163,6 @@ extension ProfileViewController: UIImagePickerControllerDelegate, UINavigationCo
         imagePicker.delegate = self
         imagePicker.allowsEditing = true
         imagePicker.mediaTypes = [kUTTypeImage as String]
-        imagePicker.mediaTypes = [kUTTypeImage as String]
         self.present(imagePicker, animated: true, completion: nil)
     }
     

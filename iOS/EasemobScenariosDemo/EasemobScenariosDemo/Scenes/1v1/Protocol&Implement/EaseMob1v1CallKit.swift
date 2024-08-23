@@ -18,6 +18,8 @@ final class EaseMob1v1CallKit: NSObject {
     
     private var handlers: NSMapTable<NSString,EaseMobCallKit.CallListener> = NSMapTable<NSString, EaseMobCallKit.CallListener>.strongToWeakObjects()
     
+    @UserDefault("EaseScenariosDemoPhone", defaultValue: "") private var phone
+    
     private var callId = ""
     
     private var remoteUid: UInt = 0
@@ -141,9 +143,22 @@ extension EaseMob1v1CallKit: EaseMobCallKit.CallProtocol {
     }
     
     func cancelMatch() {
-        EasemobBusinessRequest.shared.sendDELETERequest(api: .matchUser(()), params: [:]) { result, error in
-            
+        EasemobBusinessRequest.shared.sendDELETERequest(api: .cancelMatch(self.phone), params: [:]) { [weak self] result, error in
+            guard let `self` = self else { return }
+            if error == nil {
+                for key in self.handlers.keyEnumerator().allObjects {
+                    if let key = key as? NSString, let listener = self.handlers.object(forKey: key) {
+                        listener.onCallStatusChanged(status: .idle, reason: "Cancel match")
+                    }
+                }
+            }
         }
+    }
+    
+    func cancelMatchNotify() {
+        let message = ChatMessage(conversationID: self.currentUser.matchedChatUser, body: ChatCMDMessageBody(action: EaseMob1v1SomeUserMatchCanceled), ext: nil)
+        message.deliverOnlineOnly = true
+        ChatClient.shared().chatManager?.send(message, progress: nil)
     }
     
     func acceptCall() {
@@ -194,20 +209,37 @@ extension EaseMob1v1CallKit: EaseChatUIKit.ChatEventsListener {
                 }
             }
             if let body = message.body as? ChatCMDMessageBody,message.to == ChatClient.shared().currentUsername ?? "" {
-                if message.from == "admin",body.action == EaseMob1v1SomeUserMatchedYou {
-                    if let json = message.ext as? [String:Any] {
-                        let matchedUser = model(from: json, MatchUserInfo.self)
-                        self.localUid = UInt(matchedUser.agoraUid) ?? 0
-                        self.currentUser = matchedUser
-                        self.currentUser.id = EaseChatUIKitContext.shared?.currentUserId ?? ""
+                if message.from == "admin" {
+                    if body.action == EaseMob1v1SomeUserMatchedYou {
+                        if let json = message.ext as? [String:Any] {
+                            let matchedUser = model(from: json, MatchUserInfo.self)
+                            self.localUid = UInt(matchedUser.agoraUid) ?? 0
+                            self.currentUser = matchedUser
+                            self.currentUser.id = EaseChatUIKitContext.shared?.currentUserId ?? ""
+                            self.requestUserInfo()
+                        }
+                        self.prepareEngine()
+                        for key in self.handlers.keyEnumerator().allObjects {
+                            if let key = key as? NSString, let listener = self.handlers.object(forKey: key) {
+                                listener.onCallStatusChanged(status: .preparing, reason: "Call You")
+                            }
+                        }
                     }
-                    self.prepareEngine()
-                    for key in self.handlers.keyEnumerator().allObjects {
-                        if let key = key as? NSString, let listener = self.handlers.object(forKey: key) {
-                            listener.onCallStatusChanged(status: .preparing, reason: "Call You")
+                    if body.action == EaseMob1v1SomeUserMatchCanceled {
+                        for key in self.handlers.keyEnumerator().allObjects {
+                            if let key = key as? NSString, let listener = self.handlers.object(forKey: key) {
+                                listener.onCallStatusChanged(status: .idle, reason: "Cancel match")
+                            }
                         }
                     }
                 } else {
+                    if body.action == EaseMob1v1SomeUserMatchCanceled {
+                        for key in self.handlers.keyEnumerator().allObjects {
+                            if let key = key as? NSString, let listener = self.handlers.object(forKey: key) {
+                                listener.onCallStatusChanged(status: .idle, reason: "Cancel match")
+                            }
+                        }
+                    }
                     if body.action == EaseMob1v1CallKit1v1End {
                         if let reason = message.ext?["endCallReason"] as? String {
                             self.insertEndMessage(conversationId: message.conversationId)
@@ -248,8 +280,15 @@ extension EaseMob1v1CallKit: EaseChatUIKit.ChatEventsListener {
             }
             if message.to == ChatClient.shared().currentUsername ?? ""  {
                 if let inviteCallId = message.ext?["EaseMob1v1CallKitCallId"] as? String,let inviteKey = message.ext?[EaseMob1v1CallKit1v1Invite] as? String,inviteKey == EaseMob1v1CallKit1v1Invite {
-                    let callerId = UInt(inviteCallId) ?? 0
-                    let calleeId = UInt(self.callId) ?? 0
+                    if let json = message.ext as? [String:Any],let user = EaseChatUIKitContext.shared?.userCache?[message.from] {
+                        let matchedUser = MatchUserInfo()
+                        matchedUser.id = EaseChatUIKitContext.shared?.currentUserId ?? ""
+                        matchedUser.avatarURL = user.avatarURL
+                        matchedUser.matchedChatUser = message.from
+                        matchedUser.matchedUser = user.nickname
+                        self.localUid = UInt(matchedUser.agoraUid) ?? 0
+                        self.currentUser = matchedUser
+                    }
                     self.prepareEngine()
                     if self.callId.isEmpty {
                         self.callId = inviteCallId
@@ -260,6 +299,24 @@ extension EaseMob1v1CallKit: EaseChatUIKit.ChatEventsListener {
                         }
                     }
                 }
+            }
+        }
+    }
+    
+    func requestUserInfo() {
+        Task {
+            let profiles = await EaseChatUIKitContext.shared?.userProfileProvider?.fetchProfiles(profileIds: [self.currentUser.matchedChatUser]) ?? []
+            let userId = self.currentUser.matchedChatUser
+            let profile = profiles.first
+            if let user = EaseChatUIKitContext.shared?.userCache?[self.currentUser.matchedChatUser] {
+                user.nickname = profile?.nickname ?? userId
+                user.avatarURL = profile?.avatarURL ?? ""
+            } else {
+                let user = EaseChatProfile()
+                user.id = userId
+                user.nickname = profile?.nickname ?? userId
+                user.avatarURL = profile?.avatarURL ?? ""
+                EaseChatUIKitContext.shared?.userCache?[userId] = user
             }
         }
     }

@@ -140,6 +140,10 @@ User A (Caller)   |  User B (Callee)   |  Server
     }
 ```
 
+3.异常结束情况
+- App进入后台时，如果用户未在通话中而且已匹配的话，需要调用`EaseMob1v1CallKit.shared.cancelMatch()`取消匹配。否则对端用户会进入一直等待状态而且呼叫一直无人响应。
+- App进程结束时，如果用户未在通话中而且已匹配的话，需要调用`EaseMob1v1CallKit.shared.cancelMatchNotify()`发cmd消息告知对方取消匹配。否则对端用户会进入一直等待状态而且呼叫一直无人响应。
+
 ## 处理同时匹配与邀请
 
 1. 为了避免同时收到匹配和邀请的情况，需要维护一个状态变量。如果用户在振铃页面，则调用 `endCall()` 方法，并告知对方用户正忙。
@@ -154,6 +158,7 @@ User A (Caller)   |  User B (Callee)   |  Server
   - `EaseMob1v1CallKit1v1Accept`: 接听信令
   - `EaseMob1v1CallKit1v1Signaling`: 通信信令
   - `EaseMob1v1SomeUserMatchedYou`: 匹配通知
+  - `EaseMob1v1SomeUserMatchCanceled`: 异常结束通知
 
 - **结束原因枚举：**
   - `normalEnd`: 正常结束

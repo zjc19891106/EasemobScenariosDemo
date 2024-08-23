@@ -11,6 +11,7 @@ public enum EasemobBusinessApi {
     case login(Void)
     case verificationCode(String)
     case matchUser(Void)
+    case cancelMatch(String)
     case userCallStatus(String)
     case refreshIMToken(Void)
 }

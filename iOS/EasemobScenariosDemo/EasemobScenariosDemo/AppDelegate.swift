@@ -25,6 +25,8 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     
     @UserDefault("EaseChatDemoUserToken", defaultValue: "") private var token
     
+    @UserDefault("EaseScenariosDemoPhone", defaultValue: "") private var phone
+    
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -151,20 +153,23 @@ extension AppDelegate {
         ChatClient.shared().application(application, didReceiveRemoteNotification: userInfo)
     }
     
-    func applicationDidEnterBackground(_ application: UIApplication) {
-        if !EaseMob1v1CallKit.shared.onCalling {
-            self.cancelMatch()
-        }
-    }
-    
     func applicationWillTerminate(_ application: UIApplication) {
         self.cancelMatch()
         EaseMob1v1CallKit.shared.agoraKit?.leaveChannel()
+        EaseMob1v1CallKit.shared.cancelMatchNotify()
+        var backgroundTask: UIBackgroundTaskIdentifier = .invalid
+        
+        backgroundTask = application.beginBackgroundTask(expirationHandler: {
+            // 清理代码
+            application.endBackgroundTask(backgroundTask)
+            backgroundTask = .invalid
+        })
         
     }
     
     func cancelMatch() {
-        EasemobBusinessRequest.shared.sendDELETERequest(api: .matchUser(()), params: [:]) { result, error in
+        
+        EasemobBusinessRequest.shared.sendDELETERequest(api: .cancelMatch(self.phone), params: [:]) { result, error in
             
         }
     }

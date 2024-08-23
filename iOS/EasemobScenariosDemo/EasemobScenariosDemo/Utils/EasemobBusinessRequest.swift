@@ -45,7 +45,7 @@ public class EasemobError: Error,Convertible {
         callBack:@escaping ((T?,Error?) -> Void)) -> URLSessionTask? {
         print(params)
 
-        let headers = ["Accept":"application/json","Authorization":self.token,"Content-Type":"application/json"]
+        let headers = ["Accept":"application/json","Authorization":"Bearer "+self.token,"Content-Type":"application/json"]
         let task = EasemobRequest.shared.constructRequest(method: method, uri: uri, params: params, headers: headers) { data, response, error in
             DispatchQueue.main.async {
                 if error == nil,response?.statusCode ?? 0 == 200 {
@@ -84,7 +84,7 @@ public class EasemobError: Error,Convertible {
         uri: String,
         params: Dictionary<String, Any>,
         callBack:@escaping ((Dictionary<String,Any>?,Error?) -> Void)) -> URLSessionTask? {
-        let headers = ["Accept":"application/json","Authorization":self.token,"Content-Type":"application/json"]
+        let headers = ["Accept":"application/json","Authorization":"Bearer "+self.token,"Content-Type":"application/json"]
         let task = EasemobRequest.shared.constructRequest(method: method, uri: uri, params: params, headers: headers) { data, response, error in
             if error == nil,response?.statusCode ?? 0 == 200 {
                 callBack(data?.chat.toDictionary(),nil)
@@ -361,6 +361,8 @@ public extension EasemobBusinessRequest {
             uri += "/sms/send/"+phoneNum
         case .matchUser(_):
             uri += "/user/1v1/video/match"
+        case .cancelMatch(let phone):
+            uri += "/user/\(phone)/1v1/video/match"
         }
         return uri
     }

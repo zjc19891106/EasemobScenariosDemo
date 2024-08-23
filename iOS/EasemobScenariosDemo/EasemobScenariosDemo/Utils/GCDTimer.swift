@@ -140,9 +140,6 @@ final class GlobalTimer {
         self.timers.setObject(timerHandler, forKey: key as NSString)
         let currentTimeStamp = Int(Date().timeIntervalSince1970*1000)
         self.startTimeMap[key] = currentTimeStamp
-        if let timerInstance = self.timer as? TimerMaker ,timerInstance.state == .stoped {
-            self.timer?.resume()
-        }
     }
     
     func removeTimer(_ key: String) {
@@ -152,9 +149,6 @@ final class GlobalTimer {
         self.startTimeMap.removeValue(forKey: key)
         self.lock.unlock()
         self.removeTimerKey = ""
-        if self.timers.count <= 0 {
-            self.timer?.cancel()
-        }
     }
     
     func removeAll() {
@@ -162,6 +156,7 @@ final class GlobalTimer {
         self.timers.removeAllObjects()
         self.startTimeMap.removeAll()
         self.lock.unlock()
+        self.timer?.cancel()
     }
     
     deinit {
