@@ -155,7 +155,10 @@ extension AppDelegate {
     
     func applicationWillTerminate(_ application: UIApplication) {
         self.cancelMatch()
-        EaseMob1v1CallKit.shared.agoraKit?.leaveChannel()
+        
+        if EaseMob1v1CallKit.shared.onCalling {
+            EaseMob1v1CallKit.shared.endCall(reason: "杀进程退出")
+        }
         EaseMob1v1CallKit.shared.cancelMatchNotify()
         var backgroundTask: UIBackgroundTaskIdentifier = .invalid
         
@@ -229,6 +232,8 @@ extension AppDelegate: UserStateChangedListener {
         //Socket state monitor network
         if state == .connected {
             NotificationCenter.default.post(name: Notification.Name(rawValue: connectionSuccessful), object: nil)
+        } else {
+            NotificationCenter.default.post(name: Notification.Name(rawValue: connectionFailed), object: nil)
         }
     }
     

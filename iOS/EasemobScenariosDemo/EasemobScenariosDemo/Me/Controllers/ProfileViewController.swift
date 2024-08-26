@@ -52,9 +52,10 @@ final class ProfileViewController: UIViewController {
                     EaseChatUIKitContext.shared?.currentUser?.nickname = nickname
                     EaseChatUIKitContext.shared?.userCache?[userId]?.nickname = nickname
                     EaseChatUIKitContext.shared?.chatCache?[userId]?.nickname = nickname
-                    if let userJson = EaseChatUIKitContext.shared?.currentUser?.toJsonObject() {
+                    if let userJson = EaseChatUIKitContext.shared?.currentUser?.toJsonObject(),let json = userJson["ease_chat_uikit_user_info"] as? [String:Any] {
                         let profile = EaseChatProfile()
-                        profile.setValuesForKeys(userJson)
+                        profile.id = userId
+                        profile.setValuesForKeys(json)
                         profile.updateFFDB()
                     }
                 } else {
@@ -190,6 +191,7 @@ extension ProfileViewController: UIImagePickerControllerDelegate, UINavigationCo
                     self?.header.profileImageView.image(with: avatarURL, placeHolder: Appearance.avatarPlaceHolder)
                     if let userJson = EaseChatUIKitContext.shared?.currentUser?.toJsonObject() {
                         let profile = EaseChatProfile()
+                        profile.id = userId
                         profile.setValuesForKeys(userJson)
                         profile.updateFFDB()
                     }
@@ -197,7 +199,12 @@ extension ProfileViewController: UIImagePickerControllerDelegate, UINavigationCo
                     self?.menuList.reloadData()
                     NotificationCenter.default.post(name: NSNotification.Name(userAvatarUpdated), object: nil)
                 } else {
-                    self?.showToast(toast: error?.localizedDescription ?? "")
+                    if let error = error as? EasemobError {
+                        self?.showToast(toast: error.message ?? "")
+                    } else {
+                        self?.showToast(toast: error?.localizedDescription ?? "")
+                    }
+                    
                 }
             }
         }
@@ -219,9 +226,13 @@ extension ProfileViewController: UIImagePickerControllerDelegate, UINavigationCo
 }
 
 extension ProfileViewController: UITextFieldDelegate {
-        
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        self.header.endEditing(true)
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        if let nickname = textField.text {
+            self.updateUserInfo(nickname: nickname)
+        }
+        return true
     }
     
     func textFieldDidEndEditing(_ textField: UITextField, reason: UITextField.DidEndEditingReason) {

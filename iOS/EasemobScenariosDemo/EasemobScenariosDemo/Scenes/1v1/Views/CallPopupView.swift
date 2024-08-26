@@ -177,7 +177,11 @@ final class CallPopupView: UIView {
     }
     
     func refresh(with user: EaseProfileProtocol) {
-        self.usernameLabel.text = user.nickname
+        var nickname = user.nickname
+        if nickname.isEmpty {
+            nickname = "匿名用户-\(user.id)"
+        }
+        self.usernameLabel.text = nickname
         self.userImageView.image(with: user.avatarURL, placeHolder: Appearance.avatarPlaceHolder)
     }
     

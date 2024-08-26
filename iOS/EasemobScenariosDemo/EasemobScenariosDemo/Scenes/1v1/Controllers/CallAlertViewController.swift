@@ -80,6 +80,11 @@ extension CallAlertViewController: TimerListener {
     func dismissSelf(timeout: Bool = false,completion: (() -> Void)? = nil) {
         self.ringService.stopRinging()
         GlobalTimer.shared.removeTimer(self.swiftClassName ?? "CallAlertViewController")
+        PresenceManager.shared.publishPresence(description: "") { error in
+            if error != nil {
+                consoleLogInfo("publishPresence error: \(error?.errorDescription ?? "")",type: .error)
+            }
+        }
         if timeout {
             EaseMob1v1CallKit.shared.endCall(reason: EaseMob1v1CallKitEndReason.timeoutEnd.rawValue)
         }

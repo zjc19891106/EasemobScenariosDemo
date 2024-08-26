@@ -14,6 +14,8 @@ let loginSuccessfulSwitchMainPage = "loginSuccessfulSwitchMainPage"
 
 let connectionSuccessful = "connectionSuccessful"
 
+let connectionFailed = "connectionFailed"
+
 let backLoginPage = "backLoginPage"
 
 final class LoginViewController: UIViewController {

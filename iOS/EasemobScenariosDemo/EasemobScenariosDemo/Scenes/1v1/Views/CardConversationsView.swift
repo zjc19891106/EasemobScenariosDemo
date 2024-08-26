@@ -52,7 +52,7 @@ final class CardConversationsView: UIView {
             self?.performDelayTask()
         }
         self.currentTask = task
-        self.queue.asyncAfter(deadline: .now() + 3, execute: task)
+        self.queue.asyncAfter(deadline: .now() + 5, execute: task)
     }
     
     func performDelayTask() {
@@ -87,8 +87,7 @@ final class CardConversationsView: UIView {
 
 extension CardConversationsView: UICollectionViewDelegate, UICollectionViewDataSource,UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        print("conversations.count:\(self.conversations.count)")
-        return self.conversations.count
+        self.conversations.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {

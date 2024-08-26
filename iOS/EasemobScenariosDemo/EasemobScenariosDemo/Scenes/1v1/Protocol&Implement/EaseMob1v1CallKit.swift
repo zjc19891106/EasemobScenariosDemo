@@ -201,12 +201,7 @@ extension EaseMob1v1CallKit: EaseChatUIKit.ChatEventsListener {
                 profile.id = message.from
                 profile.modifyTime = message.timestamp
                 EaseChatUIKitContext.shared?.chatCache?[message.from] = profile
-                if EaseChatUIKitContext.shared?.userCache?[message.from] == nil {
-                    EaseChatUIKitContext.shared?.userCache?[message.from] = profile
-                } else {
-                    EaseChatUIKitContext.shared?.userCache?[message.from]?.nickname = profile.nickname
-                    EaseChatUIKitContext.shared?.userCache?[message.from]?.avatarURL = profile.avatarURL
-                }
+                EaseChatUIKitContext.shared?.userCache?[message.from] = profile
             }
             if let body = message.body as? ChatCMDMessageBody,message.to == ChatClient.shared().currentUsername ?? "" {
                 if message.from == "admin" {
@@ -226,17 +221,22 @@ extension EaseMob1v1CallKit: EaseChatUIKit.ChatEventsListener {
                         }
                     }
                     if body.action == EaseMob1v1SomeUserMatchCanceled {
+                        guard let userId = message.ext?["matchedChatUser"] as? String else { return }
+                        let user = EaseChatUIKitContext.shared?.userCache?[userId]
+                        let nickname = user?.nickname ?? "匿名用户-\(userId)"
                         for key in self.handlers.keyEnumerator().allObjects {
                             if let key = key as? NSString, let listener = self.handlers.object(forKey: key) {
-                                listener.onCallStatusChanged(status: .idle, reason: "Cancel match")
+                                listener.onCallStatusChanged(status: .idle, reason: "\(nickname)取消配对")
                             }
                         }
                     }
                 } else {
                     if body.action == EaseMob1v1SomeUserMatchCanceled {
+                        let user = EaseChatUIKitContext.shared?.userCache?[message.from]
+                        let nickname = user?.nickname ?? "匿名用户-\(message.from)"
                         for key in self.handlers.keyEnumerator().allObjects {
                             if let key = key as? NSString, let listener = self.handlers.object(forKey: key) {
-                                listener.onCallStatusChanged(status: .idle, reason: "Cancel match")
+                                listener.onCallStatusChanged(status: .idle, reason: "\(nickname)取消配对")
                             }
                         }
                     }
@@ -271,12 +271,7 @@ extension EaseMob1v1CallKit: EaseChatUIKit.ChatEventsListener {
                 profile.id = message.from
                 profile.modifyTime = message.timestamp
                 EaseChatUIKitContext.shared?.chatCache?[message.from] = profile
-                if EaseChatUIKitContext.shared?.userCache?[message.from] == nil {
-                    EaseChatUIKitContext.shared?.userCache?[message.from] = profile
-                } else {
-                    EaseChatUIKitContext.shared?.userCache?[message.from]?.nickname = profile.nickname
-                    EaseChatUIKitContext.shared?.userCache?[message.from]?.avatarURL = profile.avatarURL
-                }
+                EaseChatUIKitContext.shared?.userCache?[message.from] = profile
             }
             if message.to == ChatClient.shared().currentUsername ?? ""  {
                 if let inviteCallId = message.ext?["EaseMob1v1CallKitCallId"] as? String,let inviteKey = message.ext?[EaseMob1v1CallKit1v1Invite] as? String,inviteKey == EaseMob1v1CallKit1v1Invite {
@@ -287,7 +282,9 @@ extension EaseMob1v1CallKit: EaseChatUIKit.ChatEventsListener {
                         matchedUser.matchedChatUser = message.from
                         matchedUser.matchedUser = user.nickname
                         self.localUid = UInt(matchedUser.agoraUid) ?? 0
-                        self.currentUser = matchedUser
+                        self.currentUser.avatarURL = matchedUser.avatarURL
+                        self.currentUser.nickname = matchedUser.nickname
+                        self.currentUser.matchedChatUser = matchedUser.matchedChatUser
                     }
                     self.prepareEngine()
                     if self.callId.isEmpty {
@@ -317,6 +314,11 @@ extension EaseMob1v1CallKit: EaseChatUIKit.ChatEventsListener {
                 user.nickname = profile?.nickname ?? userId
                 user.avatarURL = profile?.avatarURL ?? ""
                 EaseChatUIKitContext.shared?.userCache?[userId] = user
+            }
+            for key in self.handlers.keyEnumerator().allObjects {
+                if let key = key as? NSString, let listener = self.handlers.object(forKey: key) {
+                    listener.onCallStatusChanged(status: .preparing, reason: "Call You")
+                }
             }
         }
     }

@@ -54,7 +54,9 @@ final class UsersMatchViewController: UIViewController {
             self.showCallView()
         }
         EaseMob1v1CallKit.shared.addListener(listener: self)
-        
+        NotificationCenter.default.addObserver(forName: Notification.Name(connectionFailed), object: nil, queue: .main) { [weak self] notification in
+            self?.matchedUser.isHidden = true
+        }
     }
     
     deinit {
@@ -71,7 +73,13 @@ final class UsersMatchViewController: UIViewController {
                 }
                 if !onCall {
                     var profile: EaseProfileProtocol = EaseChatProfile()
-                    if reason.isEmpty { profile = self.viewModel.matchedUser } else {
+                    if reason.isEmpty {
+                        if let user = EaseChatUIKitContext.shared?.userCache?[self.viewModel.matchedUser.matchedChatUser] {
+                            profile = user
+                        } else {
+                            profile = self.viewModel.matchedUser
+                        }
+                    } else {
                         if let user = EaseChatUIKitContext.shared?.userCache?[reason] {
                             profile = user
                         }
@@ -98,7 +106,7 @@ final class UsersMatchViewController: UIViewController {
     }
     
     func startRotatingAnimation() {
-        
+        self.matchedUser.isHidden = true
         let rotation = CABasicAnimation(keyPath: "transform.rotation")
         rotation.fromValue = 0
         rotation.toValue = Double.pi * 2

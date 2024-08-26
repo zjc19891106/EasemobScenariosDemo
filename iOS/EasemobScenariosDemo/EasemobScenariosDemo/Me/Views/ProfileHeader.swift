@@ -33,6 +33,7 @@ final class ProfileHeader: UIView {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .center
         label.isUserInteractionEnabled = false
+        label.returnKeyType = .done
         return label
     }()
     
@@ -84,11 +85,14 @@ final class ProfileHeader: UIView {
             phoneLabel.heightAnchor.constraint(equalToConstant: 18),
             phoneLabel.widthAnchor.constraint(equalToConstant: ScreenWidth-40-30)
         ])
+        guard let profile = EaseChatUIKitContext.shared?.currentUser else {
+            return
+        }
         
-        self.profileImageView.image(with: EaseChatUIKitContext.shared?.currentUser?.avatarURL ?? "", placeHolder: Appearance.avatarPlaceHolder)
-        var nickname = EaseChatUIKitContext.shared?.currentUser?.nickname ?? ""
+        self.profileImageView.image(with: profile.avatarURL, placeHolder: Appearance.avatarPlaceHolder)
+        var nickname = profile.nickname
         if nickname.isEmpty {
-            nickname = "匿名用户-\(EaseChatUIKitContext.shared?.currentUserId ?? "")"
+            nickname = "匿名用户-\(profile.id)"
         }
         self.nameLabel.text = nickname
     }

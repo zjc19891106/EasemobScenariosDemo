@@ -127,6 +127,8 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             
         }
     }
+    
+    
 }
 
 extension SceneDelegate: ThemeSwitchProtocol {

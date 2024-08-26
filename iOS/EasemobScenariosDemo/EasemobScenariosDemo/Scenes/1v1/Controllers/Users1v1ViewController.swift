@@ -74,6 +74,7 @@ final class Users1v1ViewController: UIViewController {
     
     private var popVC: ConversationsPopViewController?
     
+    private var showRemoteAsSmall = true
     
     required init(with user: EaseProfileProtocol) {
         self.chatTo = user.id
@@ -124,17 +125,21 @@ final class Users1v1ViewController: UIViewController {
         super.touchesBegan(touches, with: event)
         if let touch = touches.first {
             let point = touch.location(in: self.view)
-            if self.remoteVideoView.frame.contains(point),!self.localVideoView.frame.contains(point) {
-                self.localVideoView.frame = CGRect(x: self.view.frame.width-16-109, y: NavigationHeight+60, width: 109, height: 163)
-                self.remoteVideoView.frame = self.view.bounds
-                self.view.sendSubviewToBack(self.remoteVideoView)
-                self.view.bringSubviewToFront(self.localVideoView)
-            }
-            if self.localVideoView.frame.contains(point),!self.remoteVideoView.frame.contains(point) {
-                self.remoteVideoView.frame = CGRect(x: self.view.frame.width-16-109, y: NavigationHeight+60, width: 109, height: 163)
-                self.localVideoView.frame = self.view.bounds
-                self.view.sendSubviewToBack(self.localVideoView)
-                self.view.bringSubviewToFront(self.remoteVideoView)
+            
+            if self.remoteVideoView.frame.contains(point) {
+                self.showRemoteAsSmall = !self.showRemoteAsSmall
+                if self.showRemoteAsSmall {
+                    self.remoteVideoView.frame = CGRect(x: self.view.frame.width-16-109, y: NavigationHeight+60, width: 109, height: 163)
+                    self.remoteVideoView.cornerRadius(20)
+                    self.localVideoView.frame = self.view.bounds
+                    self.view.sendSubviewToBack(self.localVideoView)
+                    self.view.bringSubviewToFront(self.remoteVideoView)
+                } else {
+                    self.localVideoView.frame = CGRect(x: self.view.frame.width-16-109, y: NavigationHeight+60, width: 109, height: 163)
+                    self.remoteVideoView.frame = self.view.bounds
+                    self.view.sendSubviewToBack(self.remoteVideoView)
+                    self.view.bringSubviewToFront(self.localVideoView)
+                }
             }
         }
     }
@@ -198,12 +203,11 @@ extension Users1v1ViewController: Users1v1ChatViewModelListener {
                 }
             }
             if let vc = self.popVC {
-                if vc.isBeingPresented {
+                if UIViewController.currentController is ConversationsPopViewController {
                     self.popVC?.refresh(messages: message)
-                }  else {
-                    if UIViewController.currentController is ConversationsPopViewController {
-                        return
-                    }
+                    return
+                } else {
+                    
                     self.presentViewController(vc,animated: true)
                 }
             }
