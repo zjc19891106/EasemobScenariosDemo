@@ -100,6 +100,8 @@ final class Users1v1ViewController: UIViewController {
         self.view.backgroundColor = .white
         self.view.addSubViews([self.localVideoView,self.remoteVideoView,self.header,self.callDuration,self.giftArea,self.chatList,self.bottomBar,self.inputBar,self.effectView,self.endCall,self.cardConversationView,self.giftsView])
         self.effectView.isHidden = true
+        self.cardConversationView.isHidden = true
+        self.giftsView.isHidden = true
         // Do any additional setup after loading the view.
         //Bind driver&viewModel
         self.viewModel.bind(giftDriver: self.giftArea)
@@ -262,10 +264,8 @@ extension Users1v1ViewController: EaseMobCallKit.CallListener {
 extension Users1v1ViewController: GiftsViewActionEventsDelegate {
     func onGiftSendClick(item: GiftEntityProtocol) {
         item.sendUser = EaseChatUIKitContext.shared?.currentUser
+        self.giftsView.dismissAnimation()
         self.viewModel.sendGift(gift: item)
-        if !item.giftEffect.isEmpty {
-            self.giftsView.dismissAnimation()
-        }
     }
     
     func onGiftSelected(item: GiftEntityProtocol) {

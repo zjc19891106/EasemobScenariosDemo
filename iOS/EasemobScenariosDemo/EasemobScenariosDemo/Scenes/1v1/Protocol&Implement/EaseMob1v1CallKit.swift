@@ -126,6 +126,7 @@ extension EaseMob1v1CallKit: EaseMobCallKit.CallProtocol {
     }
     
     func endCall( reason: String) {
+        self.onCalling = false
         var ext: [String:Any] = ["EaseMob1v1CallKit1v1Signaling":EaseMob1v1CallKit1v1Signaling,"EaseMob1v1CallKitCallId":self.callId,"endCallReason":reason]
         let json = EaseChatUIKitContext.shared?.currentUser?.toJsonObject() ?? [:]
         ext.merge(json) { _, new in

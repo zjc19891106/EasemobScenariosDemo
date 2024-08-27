@@ -128,6 +128,7 @@ extension GiftsView: UICollectionViewDelegate,UICollectionViewDataSource,GiftEnt
     }
 
     func showAnimation() {
+        self.isHidden = false
         UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseOut, animations: {
             self.transform = CGAffineTransform(translationX: 0, y: -self.frame.height)
         }, completion: nil)
@@ -136,7 +137,9 @@ extension GiftsView: UICollectionViewDelegate,UICollectionViewDataSource,GiftEnt
     func dismissAnimation() {
         UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseOut, animations: {
             self.transform = .identity
-        }, completion: nil)
+        }, completion: { _ in
+            self.isHidden = true
+        })
     }
 }
 

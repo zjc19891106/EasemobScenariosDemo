@@ -155,11 +155,11 @@ extension AppDelegate {
     
     func applicationWillTerminate(_ application: UIApplication) {
         self.cancelMatch()
-        
         if EaseMob1v1CallKit.shared.onCalling {
             EaseMob1v1CallKit.shared.endCall(reason: "杀进程退出")
+        } else {
+            EaseMob1v1CallKit.shared.cancelMatchNotify()
         }
-        EaseMob1v1CallKit.shared.cancelMatchNotify()
         var backgroundTask: UIBackgroundTaskIdentifier = .invalid
         
         backgroundTask = application.beginBackgroundTask(expirationHandler: {
