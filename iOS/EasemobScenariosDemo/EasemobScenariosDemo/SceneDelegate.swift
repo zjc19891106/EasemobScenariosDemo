@@ -105,6 +105,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             self.cancelMatch()
             EaseMob1v1CallKit.shared.cancelMatchNotify()
             ChatClient.shared().applicationDidEnterBackground(UIApplication.shared)
+            NotificationCenter.default.post(name: NSNotification.Name(connectionFailed), object: nil)
         }
     }
 

@@ -72,9 +72,17 @@ final class Users1v1ViewController: UIViewController {
     
     private var chatTo = ""
     
-    private var popVC: ConversationsPopViewController?
+    public private(set) lazy var cardConversationView: CardConversationsView = {
+        CardConversationsView(frame: CGRect(x: 0, y: -(StatusBarHeight+78), width: ScreenWidth, height: StatusBarHeight+78), infos: [])
+    }()
+    
+    public private(set) lazy var giftsView: GiftsView = {
+        GiftsView(frame: CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: (self.view.frame.height-BottomBarHeight)/2.0), gifts: self.viewModel.gifts()).backgroundColor(UIColor.theme.neutralColor98)
+    }()
     
     private var showRemoteAsSmall = true
+    
+    private var showMiniConversations = false
     
     required init(with user: EaseProfileProtocol) {
         self.chatTo = user.id
@@ -90,7 +98,7 @@ final class Users1v1ViewController: UIViewController {
         super.viewDidLoad()
         UIApplication.shared.isIdleTimerDisabled = true
         self.view.backgroundColor = .white
-        self.view.addSubViews([self.localVideoView,self.remoteVideoView,self.header,self.callDuration,self.giftArea,self.chatList,self.bottomBar,self.inputBar,self.effectView,self.endCall])
+        self.view.addSubViews([self.localVideoView,self.remoteVideoView,self.header,self.callDuration,self.giftArea,self.chatList,self.bottomBar,self.inputBar,self.effectView,self.endCall,self.cardConversationView,self.giftsView])
         self.effectView.isHidden = true
         // Do any additional setup after loading the view.
         //Bind driver&viewModel
@@ -114,6 +122,7 @@ final class Users1v1ViewController: UIViewController {
         }
         GlobalTimer.shared.addTimer(self.swiftClassName ?? "Users1v1ViewController", timerHandler: self)
         
+        self.giftsView.addActionHandler(actionHandler: self)
     }
     
     
@@ -140,6 +149,12 @@ final class Users1v1ViewController: UIViewController {
                     self.view.sendSubviewToBack(self.remoteVideoView)
                     self.view.bringSubviewToFront(self.localVideoView)
                 }
+            }
+            if !self.giftsView.frame.contains(point) {
+                self.giftsView.dismissAnimation()
+            }
+            if !self.cardConversationView.frame.contains(point) {
+                self.cardConversationView.dismissAnimation()
             }
         }
     }
@@ -184,31 +199,11 @@ extension Users1v1ViewController: Users1v1ChatViewModelListener {
     
     func receiveOtherMessage(message: [EaseChatUIKit.ChatMessage]) {
         DispatchQueue.main.async {
-            self.inputBar.hiddenInput()
-            if self.popVC == nil {
-                self.popVC = ConversationsPopViewController(messages: message) { [weak self] conversation in
-                    if let current = UIViewController.currentController as? ConversationsPopViewController {
-                        current.dismiss(animated: true,completion: {
-                            self?.popVC = nil
-                            if let info = conversation {
-                                self?.showPreviewChatMessage(info: info)
-                            }
-                        })
-                    } else {
-                        if let info = conversation {
-                            self?.showPreviewChatMessage(info: info)
-                        }
-                    }
-                    
-                }
-            }
-            if let vc = self.popVC {
-                if UIViewController.currentController is ConversationsPopViewController {
-                    self.popVC?.refresh(messages: message)
-                    return
-                } else {
-                    
-                    self.presentViewController(vc,animated: true)
+            self.cardConversationView.refresh(messages: message)
+            self.cardConversationView.dismissClosure = { [weak self] in
+                if let conversation = $0 {
+                    self?.inputBar.hiddenInput()
+                    self?.showPreviewChatMessage(info: conversation)
                 }
             }
         }
@@ -220,6 +215,7 @@ extension Users1v1ViewController: Users1v1ChatViewModelListener {
             return
         }
         let message = MessagesPopViewController(conversationId: info.id, chatType: .chat)
+        self.cardConversationView.dismissAnimation()
         self.presentViewController(message,animated: true)
     }
     
@@ -263,6 +259,20 @@ extension Users1v1ViewController: EaseMobCallKit.CallListener {
     
 }
 
+extension Users1v1ViewController: GiftsViewActionEventsDelegate {
+    func onGiftSendClick(item: GiftEntityProtocol) {
+        item.sendUser = EaseChatUIKitContext.shared?.currentUser
+        self.viewModel.sendGift(gift: item)
+        if !item.giftEffect.isEmpty {
+            self.giftsView.dismissAnimation()
+        }
+    }
+    
+    func onGiftSelected(item: GiftEntityProtocol) {
+        
+    }
+}
+
 extension Users1v1ViewController: BottomAreaToolBarActionEvents {
     func onKeyboardWillWakeup() {
         self.inputBar.show()
@@ -270,7 +280,7 @@ extension Users1v1ViewController: BottomAreaToolBarActionEvents {
     
     func onBottomItemClicked(item: any ChatBottomItemProtocol) {
         if item.type == 0 {
-            DialogManager.shared.showGiftsDialog(titles: ["礼物列表"], gifts: [self.giftViewController])
+            self.giftsView.showAnimation()
         }
     }
 }

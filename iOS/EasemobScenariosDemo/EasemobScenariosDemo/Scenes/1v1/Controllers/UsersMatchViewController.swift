@@ -172,9 +172,13 @@ extension UsersMatchViewController: EaseMobCallKit.CallListener {
             case .ended:
                 if let current = UIViewController.currentController as? CallAlertViewController {
                     current.dismissSelf(timeout: reason == EaseMob1v1CallKitEndReason.timeoutEnd.rawValue) {
-                        DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.3) {
+                        DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.58) {
                             self.showToast(with: reason)
                         }
+                    }
+                } else {
+                    DispatchQueue.main.asyncAfter(wallDeadline: .now()+1) {
+                        self.showToast(with: reason)
                     }
                 }
                 

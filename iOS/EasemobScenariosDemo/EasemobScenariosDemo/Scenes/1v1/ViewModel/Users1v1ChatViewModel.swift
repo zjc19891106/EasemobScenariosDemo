@@ -106,7 +106,6 @@ final class Users1v1ChatViewModel: NSObject {
     func sendGift(gift: GiftEntityProtocol) {
         if !gift.giftEffect.isEmpty {
             self.giftAnimationDriver?.animation(with: gift)
-            UIViewController.currentController?.dismiss(animated: true)
         }
         self.sendGiftMessage(to: self.chatTo, eventType: EaseMob1v1ChatGift, infoMap: gift.toJsonObject()) { [weak self] message, error in
             if error == nil {

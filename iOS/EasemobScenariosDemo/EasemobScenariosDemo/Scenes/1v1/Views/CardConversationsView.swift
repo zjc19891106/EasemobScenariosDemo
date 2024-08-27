@@ -34,6 +34,7 @@ final class CardConversationsView: UIView {
     }
     
     func refresh(messages: [ChatMessage]) {
+        self.showAnimation()
         for message in messages {
             self.newConversation(with: message)
         }
@@ -59,6 +60,7 @@ final class CardConversationsView: UIView {
         DispatchQueue.main.async {
             self.dismissClosure?(nil)
             self.conversations.removeAll()
+            self.dismissAnimation()
         }
     }
     
@@ -82,6 +84,18 @@ final class CardConversationsView: UIView {
         info.lastMessage = message
         _ = info.showContent
         return info
+    }
+    
+    func showAnimation() {
+        UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseOut, animations: {
+            self.transform = CGAffineTransform(translationX: 0, y: StatusBarHeight+78)
+        }, completion: nil)
+    }
+    
+    func dismissAnimation() {
+        UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseOut, animations: {
+            self.transform = .identity
+        }, completion: nil)
     }
 }
 

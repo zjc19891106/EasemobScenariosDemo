@@ -51,7 +51,17 @@ import EaseChatUIKit
     }()
 
     lazy var giftList: UICollectionView = {
-        UICollectionView(frame: CGRect(x: 15, y: 0, width: self.frame.width - 30, height: ScreenHeight/2.0-60-BottomBarHeight), collectionViewLayout: self.flowLayout).registerCell(GiftEntityCell.self, forCellReuseIdentifier: "GiftEntityCell").delegate(self).dataSource(self).showsHorizontalScrollIndicator(false).backgroundColor(.clear).showsVerticalScrollIndicator(false)
+        UICollectionView(frame: CGRect(x: 15, y: self.toolBar.frame.maxY + 5, width: self.frame.width-30, height: self.frame.height-self.toolBar.frame.maxY-5-BottomBarHeight), collectionViewLayout: self.flowLayout).registerCell(GiftEntityCell.self, forCellReuseIdentifier: "GiftEntityCell").delegate(self).dataSource(self).showsHorizontalScrollIndicator(false).backgroundColor(.clear).showsVerticalScrollIndicator(false)
+    }()
+    
+    lazy var indicator: UIView = {
+        UIView(frame: CGRect(x: self.frame.width/2.0-18, y: 6, width: 36, height: 5)).cornerRadius(2.5).backgroundColor(UIColor.theme.neutralColor8)
+    }()
+    
+    private lazy var toolBar: PageContainerTitleBar = {
+        PageContainerTitleBar(frame: CGRect(x: 0, y: self.indicator.frame.maxY + 4, width: self.frame.width, height: 44), choices: ["礼物"]) { [weak self] in
+            consoleLogInfo($0, type: .debug)
+        }.backgroundColor(UIColor.theme.neutralColor98)
     }()
 
     override init(frame: CGRect) {
@@ -64,9 +74,11 @@ import EaseChatUIKit
     ///   - gifts: Conform ``GiftEntityProtocol`` class instance array.
     @objc required public convenience init(frame: CGRect, gifts: [GiftEntityProtocol]) {
         self.init(frame: frame)
+        self.backgroundColor = UIColor.theme.neutralColor98
+        self.cornerRadius(16, [.topLeft,.topRight], .clear, 0)
         self.gifts = gifts
         self.giftList.bounces = false
-        self.addSubViews([self.giftList])
+        self.addSubViews([self.indicator,self.toolBar,self.giftList])
         self.backgroundColor = .clear
         self.giftList.isScrollEnabled = true
     }
@@ -115,6 +127,17 @@ extension GiftsView: UICollectionViewDelegate,UICollectionViewDataSource,GiftEnt
         super.hitTest(point, with: event)
     }
 
+    func showAnimation() {
+        UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseOut, animations: {
+            self.transform = CGAffineTransform(translationX: 0, y: -self.frame.height)
+        }, completion: nil)
+    }
+    
+    func dismissAnimation() {
+        UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseOut, animations: {
+            self.transform = .identity
+        }, completion: nil)
+    }
 }
 
 

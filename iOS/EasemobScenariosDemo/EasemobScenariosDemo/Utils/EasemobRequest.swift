@@ -41,6 +41,8 @@ public struct EasemobRequestHTTPMethod: RawRepresentable, Equatable, Hashable {
     
     @UserDefault("EaseChatDemoServerConfig", defaultValue: Dictionary<String,String>()) private var serverConfig
     
+    @UserDefault("EaseScenariosDemoPhone", defaultValue: "") private var phone
+    
     var host: String {
         if let restAddress = self.serverConfig["rest_server_address"],let enableDnsConfig = EaseChatUIKitClient.shared.option.option_chat.value(forKey:  "enableDnsConfig") as? Bool,!enableDnsConfig {
             return restAddress
@@ -133,8 +135,7 @@ public struct EasemobRequestHTTPMethod: RawRepresentable, Equatable, Hashable {
 
         guard let imageData = image.jpegData(compressionQuality: 0.1) else { return }
         // 创建上传的 URLRequest
-        guard let userId = EaseChatUIKitContext.shared?.currentUserId  else { return }
-        var request = URLRequest(url: URL(string: ServerHost+"/inside/app/user/\(userId)/1v1/video/avatar/upload")!)
+        var request = URLRequest(url: URL(string: ServerHost+"/inside/app/user/\(self.phone)/1v1/video/avatar/upload")!)
         request.httpMethod = "POST"
         let boundary = Date().timeIntervalSince1970*1000
         request.addValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
