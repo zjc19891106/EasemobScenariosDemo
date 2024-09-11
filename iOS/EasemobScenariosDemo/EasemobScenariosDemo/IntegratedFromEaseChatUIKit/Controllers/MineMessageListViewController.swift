@@ -45,6 +45,7 @@ final class MineMessageListViewController: MessageListController {
         DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.2) {
             self.setTitleAttribute(info: self.profile, doNotDisturb: self.mute)
         }
+        
     }
     
     override func viewContact(body: ChatCustomMessageBody) {
