@@ -145,6 +145,42 @@ extension EaseMob1v1CallKit: EaseMobCallKit.CallProtocol {
         
     }
     
+    func match() {
+        EasemobBusinessRequest.shared.sendPOSTRequest(api: .matchUser(()), params: ["phoneNumber":self.phone]) { [weak self] result, error in
+            guard let `self` = self else { return }
+            if error == nil {
+                if let json = result {
+                    self.requestMatchedUserInfo(json: json)
+                }
+            } else {
+                if let error = error as? EasemobError {
+                    consoleLogInfo("matchUser Error: \(error.message ?? "")", type: .error)
+                }
+            }
+        }
+    }
+    
+    private func requestMatchedUserInfo(json: [String:Any],role: CallPopupView.CallRole = .caller) {
+        let matchUser = model(from: json, MatchUserInfo.self)
+        matchUser.id = EaseChatUIKitContext.shared?.currentUserId ?? ""
+        Task {
+            let profiles = await EaseChatUIKitContext.shared?.userProfileProvider?.fetchProfiles(profileIds: [matchUser.id]) ?? []
+            if let profile = profiles.first {
+                matchUser.nickname = profile.nickname
+                matchUser.avatarURL = profile.avatarURL
+            }
+            self.currentUser = matchUser
+            DispatchQueue.main.async {
+                self.prepareEngine()
+                for key in self.handlers.keyEnumerator().allObjects {
+                    if let key = key as? NSString, let listener = self.handlers.object(forKey: key) {
+                        listener.onCallStatusChanged(status: .preparing, reason: "Call You")
+                    }
+                }
+            }
+        }
+    }
+    
     func cancelMatch() {
         EasemobBusinessRequest.shared.sendDELETERequest(api: .cancelMatch(self.phone), params: [:]) { [weak self] result, error in
             guard let `self` = self else { return }
