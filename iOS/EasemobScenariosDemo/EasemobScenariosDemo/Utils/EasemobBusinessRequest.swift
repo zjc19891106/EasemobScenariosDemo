@@ -363,6 +363,8 @@ public extension EasemobBusinessRequest {
             uri += "/user/1v1/video/match"
         case .cancelMatch(let phone):
             uri += "/user/\(phone)/1v1/video/match"
+        case .fetchRTCToken(let phoneNum):
+            uri = "/inside/token/rtc/channel/{channelName}/phoneNumber/\(phoneNum)/1v1video"
         }
         return uri
     }

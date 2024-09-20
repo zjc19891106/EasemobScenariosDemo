@@ -45,8 +45,10 @@ final class MineMessageListViewController: MessageListController {
         DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.2) {
             self.setTitleAttribute(info: self.profile, doNotDisturb: self.mute)
         }
-        
+        EaseMob1v1CallKit.shared.requestRTCToken(chatId: self.profile.id)
     }
+    
+
     
     override func viewContact(body: ChatCustomMessageBody) {
         
@@ -152,10 +154,10 @@ final class MineMessageListViewController: MessageListController {
         self.requestCameraAndMicrophonePermissions { permission in
             if permission {
                 EaseMob1v1CallKit.shared.currentUser.matchedChatUser = self.profile.id
-                
                 let call = CallAlertViewController(role: .caller, profile: self.profile)
                 if role == .caller {
                     EaseMob1v1CallKit.shared.startCall()
+                    EaseMob1v1CallKit.shared.cancelMatch()
                 }
                 self.presentViewController(call,animated: true)
             }

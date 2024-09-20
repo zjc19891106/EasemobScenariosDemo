@@ -89,6 +89,22 @@ final class EaseMob1v1CallKit: NSObject {
         }
     }
     
+    func requestRTCToken(chatId: String) {
+        let channelName = String((chatId+(EaseChatUIKitContext.shared?.currentUserId ?? "")).sorted())
+        self.currentUser.channelName = channelName
+        EasemobBusinessRequest.shared.sendGETRequest(api: .fetchRTCToken(self.phone), params: [:]) { [weak self] result, error in
+            if error == nil {
+                if let json = result {
+                    if let token = json["accessToken"] as? String {
+                        self?.currentUser.rtcToken = token
+                    }
+                }
+            } else {
+                consoleLogInfo("fetchRTCToken error:\(error?.localizedDescription ?? "")", type: .error)
+            }
+        }
+    }
+    
     /// Add a listener to the call.``CallListener``
     /// - Parameter listener: The listener object confirm to``CallListener``
     func addListener(listener: EaseMobCallKit.CallListener) {
@@ -185,6 +201,9 @@ extension EaseMob1v1CallKit: EaseMobCallKit.CallProtocol {
         EasemobBusinessRequest.shared.sendDELETERequest(api: .cancelMatch(self.phone), params: [:]) { [weak self] result, error in
             guard let `self` = self else { return }
             if error == nil {
+                self.currentUser.matchedChatUser = ""
+                self.currentUser.matchedUser = ""
+                self.currentUser.channelName = ""
                 for key in self.handlers.keyEnumerator().allObjects {
                     if let key = key as? NSString, let listener = self.handlers.object(forKey: key) {
                         listener.onCallStatusChanged(status: .idle, reason: "Cancel match")
@@ -273,6 +292,9 @@ extension EaseMob1v1CallKit: EaseChatUIKit.ChatEventsListener {
                                 self.currentUser.matchedChatUser = ""
                             }
                         }
+                        self.currentUser.matchedChatUser = ""
+                        self.currentUser.matchedUser = ""
+                        self.currentUser.channelName = ""
                     }
                 } else {
                     if body.action == EaseMob1v1SomeUserMatchCanceled {
@@ -287,6 +309,9 @@ extension EaseMob1v1CallKit: EaseChatUIKit.ChatEventsListener {
                                 self.currentUser.matchedChatUser = ""
                             }
                         }
+                        self.currentUser.matchedChatUser = ""
+                        self.currentUser.matchedUser = ""
+                        self.currentUser.channelName = ""
                     }
                     if body.action == EaseMob1v1CallKit1v1End {
                         if let reason = message.ext?["endCallReason"] as? String {
@@ -305,6 +330,7 @@ extension EaseMob1v1CallKit: EaseChatUIKit.ChatEventsListener {
                                 listener.onCallStatusChanged(status: .join, reason: message.conversationId)
                             }
                         }
+                        self.currentUser.channelName = String((message.from+message.to).sorted())
                     }
                 }
             }
