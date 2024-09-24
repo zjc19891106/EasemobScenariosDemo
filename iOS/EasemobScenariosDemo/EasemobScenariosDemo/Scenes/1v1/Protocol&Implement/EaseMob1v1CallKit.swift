@@ -92,7 +92,7 @@ final class EaseMob1v1CallKit: NSObject {
     func requestRTCToken(chatId: String) {
         let channelName = String((chatId+(EaseChatUIKitContext.shared?.currentUserId ?? "")).sorted())
         self.currentUser.channelName = channelName
-        EasemobBusinessRequest.shared.sendGETRequest(api: .fetchRTCToken(self.phone), params: [:]) { [weak self] result, error in
+        EasemobBusinessRequest.shared.sendGETRequest(api: .fetchRTCToken(channelName, self.phone), params: [:]) { [weak self] result, error in
             if error == nil {
                 if let json = result {
                     if let token = json["accessToken"] as? String {
@@ -362,13 +362,15 @@ extension EaseMob1v1CallKit: EaseChatUIKit.ChatEventsListener {
                         self.currentUser.matchedChatUser = matchedUser.matchedChatUser
                     }
                     self.prepareEngine()
-                    if self.callId.isEmpty {
+                    if self.callId.isEmpty || PresenceManager.shared.currentUserStatus == "Busy" {
                         self.callId = inviteCallId
                         for key in self.handlers.keyEnumerator().allObjects {
                             if let key = key as? NSString, let listener = self.handlers.object(forKey: key) {
                                 listener.onCallStatusChanged(status: .alert, reason: message.conversationId)
                             }
                         }
+                    } else {
+                        self.endCall(reason: EaseMob1v1CallKitEndReason.busyEnd.rawValue)
                     }
                 }
             }

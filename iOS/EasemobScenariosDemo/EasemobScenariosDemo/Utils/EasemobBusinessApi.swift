@@ -14,7 +14,7 @@ public enum EasemobBusinessApi {
     case cancelMatch(String)
     case userCallStatus(String)
     case refreshIMToken(Void)
-    case fetchRTCToken(String)
+    case fetchRTCToken(String,String)
 }
 
 
