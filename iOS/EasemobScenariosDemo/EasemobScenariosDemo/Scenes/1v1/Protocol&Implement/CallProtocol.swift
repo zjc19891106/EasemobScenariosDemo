@@ -22,6 +22,8 @@ public let EaseMob1v1SomeUserMatchedYou = "1v1-video-matched"
 
 public let EaseMob1v1SomeUserMatchCanceled = "1v1-video-cancel-matched"//进程终止的取消匹配
 
+public let EaseMob1v1CallKit1v1ChatInvite = "EaseMob1v1CallKit1v1ChatInvite"//聊天页面邀请
+
 enum EaseMob1v1CallKitEndReason: String {
     case normalEnd = "normal"
     case cancelEnd = "cancel"

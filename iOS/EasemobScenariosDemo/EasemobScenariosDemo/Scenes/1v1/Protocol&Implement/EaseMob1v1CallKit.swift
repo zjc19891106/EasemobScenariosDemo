@@ -32,10 +32,13 @@ final class EaseMob1v1CallKit: NSObject {
     
     public var onCalling = false
     
+    public var callType = EaseMob1v1CallKit1v1Invite
+    
     override init() {
         super.init()
         
         ChatClient.shared().chatManager?.add(self, delegateQueue: nil)
+        PresenceManager.shared.publishPresence(description: "", completion: nil)
     }
     
     func prepareEngine() {
@@ -130,7 +133,7 @@ extension EaseMob1v1CallKit: EaseMobCallKit.CallProtocol {
     func startCall() {
         self.prepareEngine()
         self.callId = (Date().timeIntervalSince1970*1000).description
-        var ext: [String:Any] = ["EaseMob1v1CallKit1v1Invite":EaseMob1v1CallKit1v1Invite,"msgType":EaseMob1v1CallKit1v1Signaling,"EaseMob1v1CallKitCallId":self.callId]
+        var ext: [String:Any] = ["EaseMob1v1CallKit1v1Invite":EaseMob1v1CallKit1v1Invite,"msgType":self.callType,"EaseMob1v1CallKitCallId":self.callId]
         let json = EaseChatUIKitContext.shared?.currentUser?.toJsonObject() ?? [:]
         ext.merge(json) { _, new in
             new
@@ -165,6 +168,7 @@ extension EaseMob1v1CallKit: EaseMobCallKit.CallProtocol {
         EasemobBusinessRequest.shared.sendPOSTRequest(api: .matchUser(()), params: ["phoneNumber":self.phone]) { [weak self] result, error in
             guard let `self` = self else { return }
             if error == nil {
+                self.callId = ""
                 if let json = result {
                     self.requestMatchedUserInfo(json: json)
                 }
@@ -198,6 +202,7 @@ extension EaseMob1v1CallKit: EaseMobCallKit.CallProtocol {
     }
     
     func cancelMatch() {
+        self.callId = ""
         EasemobBusinessRequest.shared.sendDELETERequest(api: .cancelMatch(self.phone), params: [:]) { [weak self] result, error in
             guard let `self` = self else { return }
             if error == nil {
@@ -217,6 +222,7 @@ extension EaseMob1v1CallKit: EaseMobCallKit.CallProtocol {
         let message = ChatMessage(conversationID: self.currentUser.matchedChatUser, body: ChatCMDMessageBody(action: EaseMob1v1SomeUserMatchCanceled), ext: nil)
         message.deliverOnlineOnly = true
         ChatClient.shared().chatManager?.send(message, progress: nil)
+        self.callId = ""
     }
     
     func acceptCall() {
