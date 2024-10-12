@@ -178,7 +178,7 @@ final class MessagesPopViewController: MessageListController, PresentedViewType 
     private func setConversationPinMode(pin: Bool) {
         ChatClient.shared().chatManager?.pinConversation(self.profile.id, isPinned: pin,completionBlock: { [weak self] error in
             if error == nil {
-                self?.showToast(toast: "置顶会话成功")
+                self?.showToast(toast: "取消置顶会话成功")
             } else {
                 self?.showToast(toast: "置顶会话失败，原因：\(error?.errorDescription ?? "")")
             }

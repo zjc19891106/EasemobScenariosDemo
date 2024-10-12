@@ -117,6 +117,7 @@ final class Users1v1ViewController: UIViewController {
         //Add bottom bar action handler
         self.bottomBar.addActionHandler(actionHandler: self)
         //Join rtc channel
+        
         EaseMob1v1CallKit.shared.joinChannel { [weak self] in
             guard let `self` = self else { return }
             EaseMob1v1CallKit.shared.onCalling = true
@@ -130,6 +131,7 @@ final class Users1v1ViewController: UIViewController {
     
     deinit {
         EaseMob1v1CallKit.shared.removeListener(listener: self)
+        EaseMob1v1CallKit.shared.hangup()
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {

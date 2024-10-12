@@ -153,13 +153,13 @@ final class MineMessageListViewController: MessageListController {
         self.requestCameraAndMicrophonePermissions { [weak self] permission in
             guard let `self` = self else { return }
             if permission {
-                EaseMob1v1CallKit.shared.currentUser.matchedChatUser = self.profile.id
                 let call = CallAlertViewController(role: .caller, profile: self.profile)
                 if role == .caller {
+                    EaseMob1v1CallKit.shared.cancelMatchNotify()
+                    EaseMob1v1CallKit.shared.cancelMatch()
+                    EaseMob1v1CallKit.shared.currentUser.matchedChatUser = self.profile.id
                     EaseMob1v1CallKit.shared.requestRTCToken(chatId: self.profile.id)
                     EaseMob1v1CallKit.shared.callType = EaseMob1v1CallKit1v1ChatInvite
-                    EaseMob1v1CallKit.shared.startCall()
-                    EaseMob1v1CallKit.shared.cancelMatch()
                 }
                 self.presentViewController(call,animated: true)
             }

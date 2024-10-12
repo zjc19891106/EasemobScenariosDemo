@@ -71,6 +71,9 @@ final class UsersMatchViewController: UIViewController {
                 if UIViewController.currentController is CallAlertViewController || UIViewController.currentController is Users1v1ViewController {
                     onCall = true
                 }
+                if EaseMob1v1CallKit.shared.callId.isEmpty , EaseMob1v1CallKit.shared.currentUser.matchedChatUser.isEmpty {
+                    EaseMob1v1CallKit.shared.requestRTCToken(chatId: self.viewModel.matchedUser.matchedChatUser)
+                }
                 if !onCall {
                     var profile: EaseProfileProtocol = EaseChatProfile()
                     if reason.isEmpty {
@@ -170,6 +173,9 @@ extension UsersMatchViewController: EaseMobCallKit.CallListener {
                     return
                 }
             case .ended:
+                PresenceManager.shared.publishPresence(description: "") { error in
+                    consoleLogInfo("publishPresence error:\(error?.errorDescription ?? "")", type: .error)
+                }
                 if let current = UIViewController.currentController as? CallAlertViewController {
                     current.dismissSelf(timeout: reason == EaseMob1v1CallKitEndReason.timeoutEnd.rawValue) {
                         DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.58) {
@@ -207,6 +213,11 @@ extension UsersMatchViewController: EaseMobCallKit.CallListener {
         case .rtcError: reasonDescription = "对方加入频道异常"
         }
         UIViewController.currentController?.showToast(toast: reasonDescription)
+        PresenceManager.shared.publishPresence(description: "") { error in
+            if error != nil {
+                consoleLogInfo("publishPresence error:\(error?.errorDescription ?? "")", type: .error)
+            }
+        }
     }
     
     func joined1v1Chat() {

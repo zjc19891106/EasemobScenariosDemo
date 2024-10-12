@@ -23,15 +23,17 @@ final class CallAlertViewController: UIViewController,PresentedViewType {
         }
         callView.actionClosure = { [weak self] in
             if $0 == .accept {
+                EaseMob1v1CallKit.shared.currentUser.matchedChatUser = self?.profile.id ?? ""
                 EaseMob1v1CallKit.shared.acceptCall()
+                self?.dismissSelf(timeout: false)
             }  else {
                 if callView.role == .caller {
                     EaseMob1v1CallKit.shared.endCall(reason: EaseMob1v1CallKitEndReason.cancelEnd.rawValue)
                 } else {
                     EaseMob1v1CallKit.shared.endCall(reason: EaseMob1v1CallKitEndReason.refuseEnd.rawValue)
                 }
+                self?.dismissSelf(timeout: false,refuse: true)
             }
-            self?.dismissSelf()
         }
         return callView
     }()
@@ -77,12 +79,14 @@ extension CallAlertViewController: TimerListener {
         }
     }
     
-    func dismissSelf(timeout: Bool = false,completion: (() -> Void)? = nil) {
+    func dismissSelf(timeout: Bool = false,refuse: Bool = false,completion: (() -> Void)? = nil) {
         self.ringService.stopRinging()
         GlobalTimer.shared.removeTimer(self.swiftClassName ?? "CallAlertViewController")
-        PresenceManager.shared.publishPresence(description: "") { error in
-            if error != nil {
-                consoleLogInfo("publishPresence error: \(error?.errorDescription ?? "")",type: .error)
+        if refuse {
+            PresenceManager.shared.publishPresence(description: "") { error in
+                if error != nil {
+                    consoleLogInfo("publishPresence error: \(error?.errorDescription ?? "")",type: .error)
+                }
             }
         }
         if timeout {
