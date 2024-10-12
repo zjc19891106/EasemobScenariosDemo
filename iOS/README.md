@@ -206,4 +206,4 @@ User A (Caller)   |  User B (Callee)   |  Server
 
 ## 服务端源码
 
-服务端源码请参考：[1v1Video-Chat-Call-Server-Api](）
+服务端源码请参考：[1v1Video-Chat-Call-Server-Api](https://github.com/easemob/easemob-demo-appserver/tree/dev-1v1video）
