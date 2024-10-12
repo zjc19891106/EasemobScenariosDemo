@@ -31,7 +31,7 @@
 
 ## [环信场景化Demo 1v1场景中中应用的服务端Api]
 
-![服务端源码](https://github.com/easemob/easemob-demo-appserver/tree/dev-1v1video)
+[服务端源码](https://github.com/easemob/easemob-demo-appserver/tree/dev-1v1video)
 
 
 ## 反馈
