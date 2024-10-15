@@ -5,12 +5,12 @@
       "scale" : "1x"
     },
     {
-      "filename" : "match_background1@2x.png",
+      "filename" : "card02@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "match_background1@3x.png",
+      "filename" : "card02.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
